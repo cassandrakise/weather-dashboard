@@ -21,7 +21,10 @@
     font-size: 16px;
   }
   
-  h1,
+  h1 {
+    color: var(--tertiary); /* ask for help with making this overall -- not in main, so unsure of what's up */
+  }
+  
   h2,
   h3,
   h4,

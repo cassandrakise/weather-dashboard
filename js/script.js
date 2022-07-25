@@ -3,14 +3,15 @@ var cityButtonsEl = document.querySelector('#city-buttons');
 var cityEl = document.querySelector('#city');
 var searchContainerEl = document.querySelector('#searchCity-container');
 var citySearchTerm = document.querySelector('#city-term');
+var cityName = ""
 
-var formSubmitHandler = function (event) {
+var citySubmit = function (event) {
   event.preventDefault();
 
-  var cityName = cityEl.value.trim();
+    cityName = cityEl.value.trim();
 
   if (cityName) {
-    getUserRepos(cityName);
+    getWeatherInfo(cityName);
 
     searchContainerEl.textContent = '';
     cityEl.value = '';
@@ -19,24 +20,26 @@ var formSubmitHandler = function (event) {
   }
 };
 
-var buttonClickHandler = function (event) {
+var buttonClick = function (event) {
   var place = event.target.getAttribute('data-city');
 
   if (place) {
-    getFeaturedRepos(place);
+    getWeatherInfo (place);
 
     searchContainerEl.textContent = '';
   }
 };
 
 var getWeatherInfo = function (city) {
-  var apiUrl = 'https://api.github.com/users/' + city + '/repos';
+  var apiUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit=1&appid=ff6a273910ec546d256f63f1ed5537a8'; 
 
   fetch(apiUrl)
     .then(function (response) {
       if (response.ok) {
         response.json().then(function (data) {
-          displayWeather(data, city);
+            console.log(data)
+            getFeaturedWeather (data[0].lat, data[0].lon) 
+          //displayWeather(data, city);
         });
       } else {
         alert('Error: ' + response.statusText);
@@ -47,13 +50,14 @@ var getWeatherInfo = function (city) {
     });
 };
 
-var getFeaturedWeather = function (place) {
-  var apiUrl = 'http://api.openweathermap.org/geo/1.0/direct?q=' + cityName + '&limit={limit}&appid={API key}';
+var getFeaturedWeather = function (lat, lon) {
+  var apiUrl = 'http://api.openweathermap.org/data/2.5/onecall?lat=' + lat + '&lon=' + lon + '&units=imperial&exclude=minutely,hourly&appid=ff6a273910ec546d256f63f1ed5537a8'; // what is the API key in this situation? -> https://openweathermap.org/api/geocoding-api
 
   fetch(apiUrl).then(function (response) {
     if (response.ok) {
       response.json().then(function (data) {
-        displayWeather(data.items, place);
+        console.log(data)
+       displayWeather(data);
       });
     } else {
       alert('Error: ' + response.statusText);
@@ -61,40 +65,40 @@ var getFeaturedWeather = function (place) {
   });
 };
 
-var displayWeather = function (weather, searchTerm) {
-  if (weather.length === 0) {
-    searchContainerEl.textContent = 'No cities found.';
-    return;
-  }
+var displayWeather = function (weather) {
+  console.log(weather.current);
+  console.log(weather.daily);
+  
+// will then need to independently call all the variables from current and daily datasets
 
-  citySearchTerm.textContent = searchTerm;
+  // citySearchTerm.textContent = searchTerm;
 
-  for (var i = 0; i < weather.length; i++) {
-    var weatherInfo = weather[i].owner.login + '/' + weather[i].name; // needs to be switched for city search
+  // for (var i = 0; i < weather.length; i++) {
+  //   var weatherInfo = weather[i].owner.login + '/' + weather[i].name; // needs to be switched for city search
 
-    var weatherEl = document.createElement('div');
-    weatherEl.classList = 'list-item flex-row justify-space-between align-center';
+  //   var weatherEl = document.createElement('div');
+  //   weatherEl.classList = 'list-item flex-row justify-space-between align-center';
 
-    var titleEl = document.createElement('span');
-    titleEl.textContent = weatherInfo;
+  //   var titleEl = document.createElement('span');
+  //   titleEl.textContent = weatherInfo;
 
-    weatherEl.appendChild(titleEl);
+  //   weatherEl.appendChild(titleEl);
 
-    var resultEl = document.createElement('span');
-    resultEl.classList = 'flex-row align-center';
+  //   var resultEl = document.createElement('span');
+  //   resultEl.classList = 'flex-row align-center';
 
-    if (weather[i].open_issues_count > 0) {
-      resultEl.innerHTML =
-        "<i class='fas fa-times status-icon icon-danger'></i>" + weather[i].open_issues_count + ' issue(s)';
-    } else {
-      resultEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
-    }
+  //   if (weather[i].open_issues_count > 0) {
+  //     resultEl.innerHTML =
+  //       "<i class='fas fa-times status-icon icon-danger'></i>" + weather[i].open_issues_count + ' issue(s)';
+  //   } else {
+  //     resultEl.innerHTML = "<i class='fas fa-check-square status-icon icon-success'></i>";
+  //   }
 
-    weatherEl.appendChild(resultEl);
+  //   weatherEl.appendChild(resultEl);
 
-    searchContainerEl.appendChild(weatherEl);
-  }
+  //   searchContainerEl.appendChild(weatherEl);
+  // }
 };
 
-userCityEl.addEventListener('submit', formSubmitHandler);
-cityButtonsEl.addEventListener('click', buttonClickHandler);
+userCityEl.addEventListener('submit', citySubmit);
+cityButtonsEl.addEventListener('click', buttonClick);

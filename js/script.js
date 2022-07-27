@@ -66,10 +66,13 @@ var getFeaturedWeather = function (lat, lon) {
 };
 
 var displayWeather = function (weather) {
+  
   console.log(weather.current);
   console.log(weather.daily);
-  
-// will then need to independently call all the variables from current and daily datasets
+
+
+//target through document.querySelector --> target through container and grab data
+// will then need to independently call all the variables from current and daily datasets - textContent / innerHTML and then append card for day or week weather
 
   // citySearchTerm.textContent = searchTerm;
 
